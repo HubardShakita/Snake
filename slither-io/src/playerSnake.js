@@ -30,76 +30,47 @@ PlayerSnake.prototype.spaceKeyUp = function() {
 
 PlayerSnake.prototype.tempUpdate = PlayerSnake.prototype.update;
 PlayerSnake.prototype.update = function() {
-    // добавьте переменную для отслеживания состояния управления мышью
-    this.mouseControl = true;
+    // добавляем переменную для отслеживания режима управления
+    this.controlMode = this.controlMode || 'mouse'; // по умолчанию используем управление мышью
 
-    // проверьте, нажата ли кнопка (замените 'key' на нужную вам клавишу)
-    if (this.game.input.keyboard.isDown(90)) {
-        this.mouseControl = !this.mouseControl;
+    var mousePosX = this.game.input.activePointer.worldX;
+    var mousePosY = this.game.input.activePointer.worldY;
+    var headX = this.head.body.x;
+    var headY = this.head.body.y;
+    var angle = (180*Math.atan2(mousePosX-headX,mousePosY-headY)/Math.PI);
+    if (angle > 0) {
+        angle = 180-angle;
     }
+    else {
+        angle = -180-angle;
+    }
+    var dif = this.head.body.angle - angle;
+    this.head.body.setZeroRotation();
 
-    if (this.mouseControl) {
-        var mousePosX = this.game.input.activePointer.worldX;
-        var mousePosY = this.game.input.activePointer.worldY;
-        var headX = this.head.body.x;
-        var headY = this.head.body.y;
-        var angle = (180*Math.atan2(mousePosX-headX,mousePosY-headY)/Math.PI);
-        if (angle > 0) {
-            angle = 180-angle;
+    // проверяем режим управления
+    if (this.controlMode === 'mouse') {
+        if (dif < 0 && dif > -180 || dif > 180) {
+            this.head.body.rotateRight(this.rotationSpeed);
         }
-        else {
-            angle = -180-angle;
+        else if (dif > 0 && dif < 180 || dif < -180) {
+            this.head.body.rotateLeft(this.rotationSpeed);
         }
-        var dif = this.head.body.angle - angle;
-        this.head.body.setZeroRotation();
-        // ваш код для управления мышью
-    } else {
+    } else if (this.controlMode === 'arrows') {
         if (this.cursors.left.isDown) {
             this.head.body.rotateLeft(this.rotationSpeed);
         }
         else if (this.cursors.right.isDown) {
             this.head.body.rotateRight(this.rotationSpeed);
         }
-        //поворот башки при нажати на стрелки
-        else if (dif < 0 && dif > -180 || dif > 180) {
-            this.head.body.rotateRight(this.rotationSpeed);
-        }
-        else if (dif > 0 && dif < 180 || dif < -180) {
-            this.head.body.rotateLeft(this.rotationSpeed);
-        }
-        // ваш код для управления стрелками
     }
+
+    // меняем режим управления при нажатии на стрелки или движении мыши
+    if (this.game.input.activePointer.isDown) {
+        this.controlMode = 'mouse';
+    }
+    else if (this.cursors.left.isDown || this.cursors.right.isDown) {
+        this.controlMode = 'arrows';
+    }
+
     this.tempUpdate();
 }
-// PlayerSnake.prototype.update = function() {
-//     //поворот головы змейки мышкой 
-//     var mousePosX = this.game.input.activePointer.worldX;
-//     var mousePosY = this.game.input.activePointer.worldY;
-//     var headX = this.head.body.x;
-//     var headY = this.head.body.y;
-//     var angle = (180*Math.atan2(mousePosX-headX,mousePosY-headY)/Math.PI);
-//     if (angle > 0) {
-//         angle = 180-angle;
-//     }
-//     else {
-//         angle = -180-angle;
-//     }
-//     var dif = this.head.body.angle - angle;
-//     this.head.body.setZeroRotation();
-//     //добавление управления стрелками
-//     if (this.cursors.left.isDown) {
-//         this.head.body.rotateLeft(this.rotationSpeed);
-//     }
-//     else if (this.cursors.right.isDown) {
-//         this.head.body.rotateRight(this.rotationSpeed);
-//     }
-//     //поворот башки при нажати на стрелки
-//     else if (dif < 0 && dif > -180 || dif > 180) {
-//         this.head.body.rotateRight(this.rotationSpeed);
-//     }
-//     else if (dif > 0 && dif < 180 || dif < -180) {
-//         this.head.body.rotateLeft(this.rotationSpeed);
-//     }
-
-//     this.tempUpdate();
-// }
